@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Error Interceptor Log Appender -->
+    <appender name="ERROR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS},%level,%thread,%message%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>error</level>
+        </filter>
+    </appender>
+
+    <!-- Trace Interceptor Log Appender -->
+    <appender name="TRACE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS},%level,%thread,%message%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger Setting -->
+    <logger name="jp.mailmanager" level="trace">
+        <appender-ref ref="TRACE" />
+    </logger>
+
+    <logger name="org.springframework.aop.interceptor" level="trace">
+        <appender-ref ref="TRACE" />
+    </logger>
+
+    <!-- Root Logger Setting -->
+    <root level="error">
+        <appender-ref ref="ERROR" />
+    </root>
+
+</configuration>
