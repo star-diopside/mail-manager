@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>jp.mailmanager</groupId>
-    <artifactId>MailManager</artifactId>
+    <artifactId>mail-manager</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>MailManager</name>
+    <name>mail-manager</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,6 +55,16 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.5</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
@@ -68,7 +78,7 @@
     </dependencies>
 
     <build>
-        <finalName>MailManager</finalName>
+        <finalName>mail-manager-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -86,7 +96,7 @@
                             <programs>
                                 <program>
                                     <mainClass>jp.mailmanager.main.Main</mainClass>
-                                    <name>mailmanager</name>
+                                    <name>mail-manager</name>
                                 </program>
                             </programs>
                         </configuration>

@@ -1,5 +1,9 @@
 package jp.mailmanager.main;
 
+import java.io.File;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import jp.mailmanager.service.MailFileManager;
 
 import org.slf4j.Logger;
@@ -13,7 +17,7 @@ import org.springframework.stereotype.Controller;
  * メインクラス
  */
 @Controller
-public class Main {
+public class Main implements Launcher {
 
     /** ロガー */
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -36,10 +40,10 @@ public class Main {
 
         // メインクラスのインスタンスを取得する。
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Main obj = context.getBean(Main.class);
+        Launcher launcher = context.getBean("main", Launcher.class);
 
         // メイン処理を実行する。
-        System.exit(obj.execute(args));
+        System.exit(launcher.run(args));
     }
 
     /**
@@ -48,11 +52,18 @@ public class Main {
      * @param args コマンドライン引数
      * @return 終了ステータスコード
      */
-    public int execute(String[] args) {
+    public int run(String[] args) {
 
         try {
             // 処理実装クラスのメソッドを呼び出す。
-            mailFileManager.execute();
+            LinkedHashMap<File, Exception> errors = mailFileManager.copyMailFiles(args[0], args[1]);
+
+            for (Map.Entry<File, Exception> error : errors.entrySet()) {
+                System.err.println("ファイル名：" + error.getKey());
+                System.err.println("例外内容：" + error.getValue().getMessage());
+                error.getValue().printStackTrace();
+                System.err.println();
+            }
 
             // 正常終了のリターンコードを返す。
             return RETURN_SUCCESS;

@@ -21,4 +21,13 @@
         <aop:advisor pointcut="execution(public * jp.mailmanager..*(..))" advice-ref="logging" />
     </aop:config>
 
+    <!-- メッセージソース -->
+    <bean id="messageSourceAccessor" class="org.springframework.context.support.MessageSourceAccessor">
+        <constructor-arg>
+            <bean class="org.springframework.context.support.ResourceBundleMessageSource">
+                <property name="basename" value="messages" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
 </beans>
