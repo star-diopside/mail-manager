@@ -30,4 +30,15 @@
         </constructor-arg>
     </bean>
 
+    <!-- スレッドスコープ定義 -->
+    <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+        <property name="scopes">
+            <map key-type="java.lang.String" value-type="java.lang.Object">
+                <entry key="thread">
+                    <bean class="org.springframework.context.support.SimpleThreadScope" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+
 </beans>

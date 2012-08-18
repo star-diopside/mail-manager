@@ -1,22 +1,13 @@
 package jp.mailmanager.main;
 
-import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import jp.mailmanager.service.MailFileManager;
+import jp.mailmanager.gui.MailManagerFrame;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Controller;
 
 /**
  * メインクラス
  */
-@Controller
 public class Main implements Launcher {
 
     /** ロガー */
@@ -28,9 +19,6 @@ public class Main implements Launcher {
     /** リターンコード：エラー終了 */
     public static final int RETURN_ERROR = 1;
 
-    @Autowired
-    private MailFileManager mailFileManager;
-
     /**
      * エントリーポイント
      * 
@@ -39,11 +27,14 @@ public class Main implements Launcher {
     public static void main(String[] args) {
 
         // メインクラスのインスタンスを取得する。
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Launcher launcher = context.getBean("main", Launcher.class);
+        Launcher launcher = new Main();
 
         // メイン処理を実行する。
-        System.exit(launcher.run(args));
+        int result = launcher.run(args);
+
+        if (result != RETURN_SUCCESS) {
+            System.exit(result);
+        }
     }
 
     /**
@@ -55,15 +46,9 @@ public class Main implements Launcher {
     public int run(String[] args) {
 
         try {
-            // 処理実装クラスのメソッドを呼び出す。
-            LinkedHashMap<File, Exception> errors = mailFileManager.copyMailFiles(args[0], args[1]);
-
-            for (Map.Entry<File, Exception> error : errors.entrySet()) {
-                System.err.println("ファイル名：" + error.getKey());
-                System.err.println("例外内容：" + error.getValue().getMessage());
-                error.getValue().printStackTrace();
-                System.err.println();
-            }
+            // メインウィンドウを表示する。
+            MailManagerFrame frame = new MailManagerFrame();
+            frame.init();
 
             // 正常終了のリターンコードを返す。
             return RETURN_SUCCESS;
