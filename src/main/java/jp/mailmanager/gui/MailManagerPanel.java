@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.springframework.context.ApplicationContext;
 
+import jp.mailmanager.controller.action.MailManagerSelectDestDirAction;
 import jp.mailmanager.controller.action.MailManagerSelectOrigDirAction;
 import jp.mailmanager.controller.model.MailManagerModel;
 import jp.mailmanager.controller.support.AbstractModelActionListener;
@@ -100,19 +101,36 @@ public class MailManagerPanel extends JPanel {
 
         btnOrigDir.addActionListener(new MailManagerModelActionListener(context
                 .getBean(MailManagerSelectOrigDirAction.class)));
+
+        btnDestDir.addActionListener(new MailManagerModelActionListener(context
+                .getBean(MailManagerSelectDestDirAction.class)));
     }
 
+    /**
+     * MailManagerアクションモデル
+     */
     private class MailManagerModelActionListener extends AbstractModelActionListener<MailManagerModel> {
 
+        /**
+         * コンストラクタ
+         * 
+         * @param action MailManagerアクションモデル
+         */
         public MailManagerModelActionListener(ActionModelDriven<MailManagerModel> action) {
             super(action);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Component getParent() {
             return MailManagerPanel.this;
         }
 
+        /**
+         * 画面入力値をもとにモデルを取得する。
+         */
         @Override
         public MailManagerModel getModel() {
 
@@ -124,6 +142,9 @@ public class MailManagerPanel extends JPanel {
             return model;
         }
 
+        /**
+         * モデルをもとに画面入力値に反映する。
+         */
         @Override
         public void setModel(MailManagerModel model) {
 

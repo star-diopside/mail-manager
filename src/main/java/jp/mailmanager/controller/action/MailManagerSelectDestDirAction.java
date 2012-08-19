@@ -5,8 +5,8 @@ import jp.mailmanager.controller.support.ActionModelDriven;
 import jp.mailmanager.controller.support.ParentComponentAccessor;
 
 /**
- * MailManagerコピー元ディレクトリ選択イベントインタフェース
+ * MailManagerコピー先ディレクトリ選択イベントインタフェース
  */
-public interface MailManagerSelectOrigDirAction extends ActionModelDriven<MailManagerModel>, ParentComponentAccessor {
+public interface MailManagerSelectDestDirAction extends ActionModelDriven<MailManagerModel>, ParentComponentAccessor {
 
 }

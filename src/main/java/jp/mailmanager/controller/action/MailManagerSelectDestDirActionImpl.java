@@ -13,11 +13,11 @@ import org.springframework.stereotype.Controller;
 import jp.mailmanager.controller.model.MailManagerModel;
 
 /**
- * MailManagerコピー元ディレクトリ選択イベントクラス
+ * MailManagerコピー先ディレクトリ選択イベントクラス
  */
 @Controller
 @Scope(value = "thread", proxyMode = ScopedProxyMode.INTERFACES)
-public class MailManagerSelectOrigDirActionImpl implements MailManagerSelectOrigDirAction {
+public class MailManagerSelectDestDirActionImpl implements MailManagerSelectDestDirAction {
 
     /** モデル */
     private MailManagerModel model;
@@ -44,11 +44,11 @@ public class MailManagerSelectOrigDirActionImpl implements MailManagerSelectOrig
 
         JFileChooser chooser = new JFileChooser();
 
-        chooser.setSelectedFile(new File(this.model.getOrigDir()));
+        chooser.setSelectedFile(new File(this.model.getDestDir()));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        if (chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
-            this.model.setOrigDir(chooser.getSelectedFile().getAbsolutePath());
+        if (chooser.showSaveDialog(parent) == JFileChooser.APPROVE_OPTION) {
+            this.model.setDestDir(chooser.getSelectedFile().getAbsolutePath());
         }
     }
 }
