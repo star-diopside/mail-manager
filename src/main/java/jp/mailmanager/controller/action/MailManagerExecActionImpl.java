@@ -167,5 +167,9 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+
+        // 完了メッセージを出力する。
+        JOptionPane.showMessageDialog(parent, message.getMessage(Messages.INFO_COMPLETE),
+                message.getMessage(Labels.INFO), JOptionPane.INFORMATION_MESSAGE);
     }
 }
