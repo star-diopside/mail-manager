@@ -25,7 +25,12 @@
     <bean id="messageSourceAccessor" class="org.springframework.context.support.MessageSourceAccessor">
         <constructor-arg>
             <bean class="org.springframework.context.support.ResourceBundleMessageSource">
-                <property name="basename" value="messages" />
+                <property name="basenames">
+                    <list>
+                        <value>messages</value>
+                        <value>labels</value>
+                    </list>
+                </property>
             </bean>
         </constructor-arg>
     </bean>
