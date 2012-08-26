@@ -1,5 +1,11 @@
 package jp.mailmanager.main;
 
+import java.util.ResourceBundle;
+
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import jp.mailmanager.gui.MailManagerFrame;
 
 import org.slf4j.Logger;
@@ -46,6 +52,9 @@ public class Main implements Launcher {
     public int run(String[] args) {
 
         try {
+            // ルックアンドフィールの設定を行う。
+            updateLookAndFeel();
+
             // メインウィンドウを表示する。
             MailManagerFrame frame = new MailManagerFrame();
             frame.init();
@@ -60,5 +69,58 @@ public class Main implements Launcher {
             // エラー終了のリターンコードを返す。
             return RETURN_ERROR;
         }
+    }
+
+    /**
+     * 設定ファイル情報をもとにルックアンドフィールを変更する。
+     * 
+     * @throws UnsupportedLookAndFeelException ルックアンドフィールがサポートされていない場合
+     * @throws IllegalAccessException ルックアンドフィールのクラスまたは初期化子にアクセスできない場合
+     * @throws InstantiationException ルックアンドフィールのクラスの新しいインスタンスを生成できなかった場合
+     * @throws ClassNotFoundException ルックアンドフィールのクラスが見つからない場合
+     */
+    private void updateLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+            UnsupportedLookAndFeelException {
+
+        ResourceBundle resource = ResourceBundle.getBundle("mail-manager");
+
+        // ルックアンドフィール種別が設定されていない場合、処理を終了する。
+        if (!resource.containsKey("UI.LookAndFeelType")) {
+            return;
+        }
+
+        switch (resource.getString("UI.LookAndFeelType")) {
+        case "CrossPlatform":
+            // クロスプラットフォームのルックアンドフィールを設定する。
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            return;
+
+        case "System":
+            // システムのルックアンドフィールを設定する。
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            return;
+
+        case "Custom":
+            // ルックアンドフィールクラス名が設定されていない場合、処理を終了する。
+            if (!resource.containsKey("UI.LookAndFeelClassName")) {
+                return;
+            }
+
+            // 設定ファイルから取得したルックアンドフィールが使用可能であれば設定する。
+            String lookAndFeelClassName = resource.getString("UI.LookAndFeelClassName");
+
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if (lookAndFeelClassName.equals(info.getClassName())) {
+                    UIManager.setLookAndFeel(lookAndFeelClassName);
+                    return;
+                }
+            }
+
+            break;
+
+        default:
+            break;
+        }
+
     }
 }
