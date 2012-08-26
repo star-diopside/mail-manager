@@ -97,6 +97,7 @@
                             <goal>assemble</goal>
                         </goals>
                         <configuration>
+                            <copyConfigurationDirectory>true</copyConfigurationDirectory>
                             <repositoryLayout>flat</repositoryLayout>
                             <repositoryName>lib</repositoryName>
                             <programs>
@@ -129,6 +130,8 @@
                 <plugin>
                     <artifactId>maven-eclipse-plugin</artifactId>
                     <configuration>
+                        <downloadJavadocs>true</downloadJavadocs>
+                        <downloadSources>true</downloadSources>
                         <additionalConfig>
                             <file>
                                 <name>.settings/org.eclipse.core.resources.prefs</name>
