@@ -101,17 +101,17 @@ public class Main implements Launcher {
             return;
 
         case "Custom":
-            // ルックアンドフィールクラス名が設定されていない場合、処理を終了する。
-            if (!resource.containsKey("UI.LookAndFeelClassName")) {
+            // ルックアンドフィール名が設定されていない場合、処理を終了する。
+            if (!resource.containsKey("UI.LookAndFeelName")) {
                 return;
             }
 
             // 設定ファイルから取得したルックアンドフィールが使用可能であれば設定する。
-            String lookAndFeelClassName = resource.getString("UI.LookAndFeelClassName");
+            String lookAndFeelName = resource.getString("UI.LookAndFeelName");
 
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if (lookAndFeelClassName.equals(info.getClassName())) {
-                    UIManager.setLookAndFeel(lookAndFeelClassName);
+                if (lookAndFeelName.equals(info.getName()) || lookAndFeelName.equals(info.getClassName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
                     return;
                 }
             }
