@@ -102,7 +102,7 @@
                             <repositoryName>lib</repositoryName>
                             <programs>
                                 <program>
-                                    <mainClass>jp.mailmanager.main.Main</mainClass>
+                                    <mainClass>jp.mailmanager.main.Launcher</mainClass>
                                     <name>mail-manager</name>
                                 </program>
                             </programs>
