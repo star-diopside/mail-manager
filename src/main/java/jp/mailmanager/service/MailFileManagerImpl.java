@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import jp.mailmanager.constant.Messages;
+import jp.mailmanager.dao.entity.FileCheckResultImpl;
+import jp.mailmanager.dao.mapper.FileCheckResultMapper;
 import jp.mailmanager.exception.BusinessException;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -17,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * メールファイル管理処理クラス
@@ -28,19 +32,19 @@ public class MailFileManagerImpl implements MailFileManager {
     @Autowired
     private MessageSourceAccessor message;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** ファイルチェック結果Mapper */
+    @Autowired
+    private FileCheckResultMapper fileCheckResultMapper;
+
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public LinkedHashMap<File, Exception> copyMailFiles(String inputDirectory, String outputDirectory)
             throws BusinessException {
         return copyMailFiles(new File(inputDirectory), new File(outputDirectory));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public LinkedHashMap<File, Exception> copyMailFiles(File inputDirectory, File outputDirectory)
             throws BusinessException {
 
@@ -131,6 +135,30 @@ public class MailFileManagerImpl implements MailFileManager {
             count++;
             outputFile = new File(outputDirectory, base + " (" + count + ")" + ext);
         }
+
+        // ファイルチェック結果レコードを登録する。
+        Integer fileSeq = this.fileCheckResultMapper.selectMaxFileSeqFromFileHash(hashInputFile);
+
+        if (fileSeq == null) {
+            fileSeq = 1;
+        } else {
+            fileSeq++;
+        }
+
+        FileCheckResultImpl result = new FileCheckResultImpl();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        result.setFileHash(hashInputFile);
+        result.setFileSeq(fileSeq);
+        result.setInputFilePath(inputFile.getPath());
+        result.setOutputFilePath(outputFile.getPath());
+        result.setRegisterDatetime(now);
+        result.setRegisterUserId(StringUtils.EMPTY);
+        result.setUpdatedDatetime(now);
+        result.setUpdatedUserId(StringUtils.EMPTY);
+        result.setVersion(0);
+
+        this.fileCheckResultMapper.insert(result);
 
         return outputFile;
     }
