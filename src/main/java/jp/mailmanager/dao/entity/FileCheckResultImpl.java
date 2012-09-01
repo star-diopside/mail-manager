@@ -14,11 +14,17 @@ public class FileCheckResultImpl extends EntityBaseImpl<FileCheckResultPK> imple
     /** 主キー */
     private FileCheckResultPK pk = new FileCheckResultPKImpl();
 
-    /** 入力ファイルパス */
-    private String inputFilePath;
+    /** 入力ディレクトリパス */
+    private String inputDirPath;
 
-    /** 出力ファイルパス */
-    private String outputFilePath;
+    /** 入力ファイル名 */
+    private String inputFileName;
+
+    /** 出力ディレクトリパス */
+    private String outputDirPath;
+
+    /** 出力ファイル名 */
+    private String outputFileName;
 
     @Override
     public FileCheckResultPK getPK() {
@@ -51,22 +57,42 @@ public class FileCheckResultImpl extends EntityBaseImpl<FileCheckResultPK> imple
     }
 
     @Override
-    public String getInputFilePath() {
-        return this.inputFilePath;
+    public String getInputDirPath() {
+        return this.inputDirPath;
     }
 
     @Override
-    public void setInputFilePath(String inputFilePath) {
-        this.inputFilePath = inputFilePath;
+    public void setInputDirPath(String inputDirPath) {
+        this.inputDirPath = inputDirPath;
     }
 
     @Override
-    public String getOutputFilePath() {
-        return this.outputFilePath;
+    public String getInputFileName() {
+        return this.inputFileName;
     }
 
     @Override
-    public void setOutputFilePath(String outputFilePath) {
-        this.outputFilePath = outputFilePath;
+    public void setInputFileName(String inputFileName) {
+        this.inputFileName = inputFileName;
+    }
+
+    @Override
+    public String getOutputDirPath() {
+        return this.outputDirPath;
+    }
+
+    @Override
+    public void setOutputDirPath(String outputDirPath) {
+        this.outputDirPath = outputDirPath;
+    }
+
+    @Override
+    public String getOutputFileName() {
+        return this.outputFileName;
+    }
+
+    @Override
+    public void setOutputFileName(String outputFileName) {
+        this.outputFileName = outputFileName;
     }
 }

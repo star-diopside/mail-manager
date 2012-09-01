@@ -8,31 +8,59 @@ import jp.mailmanager.dao.entity.base.EntityBase;
 public interface FileCheckResult extends FileCheckResultPK, EntityBase<FileCheckResultPK> {
 
     /**
-     * 入力ファイルパスを取得する。
+     * 入力ディレクトリパスを取得する。
      * 
-     * @return 入力ファイルパス
+     * @return 入力ディレクトリパス
      */
-    String getInputFilePath();
+    String getInputDirPath();
 
     /**
-     * 入力ファイルパスを設定する。
+     * 入力ディレクトリパスを設定する。
      * 
-     * @param inputFilePath 入力ファイルパス
+     * @param inputDirPath 入力ディレクトリパス
      */
-    void setInputFilePath(String inputFilePath);
+    void setInputDirPath(String inputDirPath);
 
     /**
-     * 出力ファイルパスを取得する。
+     * 入力ファイル名を取得する。
      * 
-     * @return 出力ファイルパス
+     * @return 入力ファイル名
      */
-    String getOutputFilePath();
+    String getInputFileName();
 
     /**
-     * 出力ファイルパスを設定する。
+     * 入力ファイル名を設定する。
      * 
-     * @param outputFilePath 出力ファイルパス
+     * @param inputFileName 入力ファイル名
      */
-    void setOutputFilePath(String outputFilePath);
+    void setInputFileName(String inputFileName);
+
+    /**
+     * 出力ディレクトリパスを取得する。
+     * 
+     * @return 出力ディレクトリパス
+     */
+    String getOutputDirPath();
+
+    /**
+     * 出力ディレクトリパスを設定する。
+     * 
+     * @param outputDirPath 出力ディレクトリパス
+     */
+    void setOutputDirPath(String outputDirPath);
+
+    /**
+     * 出力ファイル名を取得する。
+     * 
+     * @return 出力ファイル名
+     */
+    String getOutputFileName();
+
+    /**
+     * 出力ファイル名を設定する。
+     * 
+     * @param outputFileName 出力ファイル名
+     */
+    void setOutputFileName(String outputFileName);
 
 }

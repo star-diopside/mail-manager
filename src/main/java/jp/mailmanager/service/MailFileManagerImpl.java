@@ -150,8 +150,10 @@ public class MailFileManagerImpl implements MailFileManager {
 
         result.setFileHash(hashInputFile);
         result.setFileSeq(fileSeq);
-        result.setInputFilePath(inputFile.getPath());
-        result.setOutputFilePath(outputFile.getPath());
+        result.setInputDirPath(inputFile.getCanonicalFile().getParent());
+        result.setInputFileName(inputFile.getName());
+        result.setOutputDirPath(outputFile.getCanonicalFile().getParent());
+        result.setOutputFileName(outputFile.getName());
         result.setRegisterDatetime(now);
         result.setRegisterUserId(StringUtils.EMPTY);
         result.setUpdatedDatetime(now);

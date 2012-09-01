@@ -17,9 +17,9 @@
     <insert id="insert" parameterType="jp.mailmanager.dao.entity.FileCheckResult">
     <![CDATA[
         INSERT INTO FILE_CHECK_RESULT
-        ( FILE_HASH, FILE_SEQ, INPUT_FILE_PATH, OUTPUT_FILE_PATH, REGISTER_DATETIME, REGISTER_USER_ID, UPDATED_DATETIME, UPDATED_USER_ID, VERSION )
+        ( FILE_HASH, FILE_SEQ, INPUT_DIR_PATH, INPUT_FILE_NAME, OUTPUT_DIR_PATH, OUTPUT_FILE_NAME, REGISTER_DATETIME, REGISTER_USER_ID, UPDATED_DATETIME, UPDATED_USER_ID, VERSION )
         VALUES
-        ( #{fileHash}, #{fileSeq}, #{inputFilePath}, #{outputFilePath}, #{registerDatetime}, #{registerUserId}, #{updatedDatetime}, #{updatedUserId}, #{version} )
+        ( #{fileHash}, #{fileSeq}, #{inputDirPath}, #{inputFileName}, #{outputDirPath}, #{outputFileName}, #{registerDatetime}, #{registerUserId}, #{updatedDatetime}, #{updatedUserId}, #{version} )
     ]]>
     </insert>
 
