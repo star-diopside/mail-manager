@@ -1,39 +1,71 @@
 package jp.mailmanager.util;
 
+import java.util.ArrayList;
+
+import org.springframework.context.support.MessageSourceAccessor;
+
 /**
- * メッセージビルダーインタフェース
+ * メッセージの構築を行うビルダーインタフェース
  */
-public interface MessageBuilder {
+public class MessageBuilder {
+
+    /** メッセージソース */
+    private MessageSourceAccessor accessor;
+
+    /** メッセージコード */
+    private String msg;
+
+    /** 引数 */
+    private ArrayList<Object> args = new ArrayList<>();
+
+    /**
+     * コンストラクタ
+     * 
+     * @param accessor メッセージソースへのアクセスを行うMessageSourceAccessor
+     */
+    public MessageBuilder(MessageSourceAccessor accessor) {
+        this.accessor = accessor;
+    }
 
     /**
      * 初期化する。
      */
-    void init();
+    public void init() {
+        this.msg = null;
+        this.args.clear();
+    }
 
     /**
      * メッセージコードを設定する。
      * 
      * @param code メッセージのコード値
      */
-    void setMessageCode(String code);
+    public void setMessageCode(String code) {
+        this.msg = code;
+    }
 
     /**
      * コード指定で引数を追加する。
      * 
      * @param code 追加引数のコード値
      */
-    void addArgumentCode(String code);
+    public void addArgumentCode(String code) {
+        this.args.add(this.accessor.getMessage(code));
+    }
 
     /**
      * 指定されたオブジェクトを引数に追加する。
      * 
      * @param arg 引数オブジェクト
      */
-    void addArgument(Object arg);
+    public void addArgument(Object arg) {
+        this.args.add(arg);
+    }
 
     /**
-     * 組み立てたメッセージを取得する。
+     * 構築したメッセージを取得する。
      */
-    String getMessage();
-
+    public String getMessage() {
+        return this.accessor.getMessage(this.msg, this.args.toArray());
+    }
 }

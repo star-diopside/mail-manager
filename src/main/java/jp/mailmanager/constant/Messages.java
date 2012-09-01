@@ -11,6 +11,9 @@ public class Messages {
     private Messages() {
     }
 
+    /** 未処理例外発生時エラーメッセージ */
+    public static final String ERROR_UNCAUGHT = "Message.Error.Uncaught";
+
     /** 必須エラーメッセージ */
     public static final String ERROR_REQUIRED = "Message.Error.Required";
 

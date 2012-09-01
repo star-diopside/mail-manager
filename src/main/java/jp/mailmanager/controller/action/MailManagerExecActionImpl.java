@@ -50,10 +50,6 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
     @Autowired
     private MessageSourceAccessor message;
 
-    /** メッセージビルダー */
-    @Autowired
-    private MessageBuilder messageBuilder;
-
     /** メールファイル管理処理クラス */
     @Autowired
     private MailFileManager mailFileManager;
@@ -75,6 +71,9 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        // メッセージビルダー
+        MessageBuilder messageBuilder = new MessageBuilder(message);
 
         // コピー元ディレクトリの入力必須チェックを行う。
         if (StringUtils.isEmpty(model.getOrigDir())) {

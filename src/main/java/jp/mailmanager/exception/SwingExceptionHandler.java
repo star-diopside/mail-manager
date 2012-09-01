@@ -6,8 +6,13 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import jp.mailmanager.constant.Labels;
+import jp.mailmanager.constant.Messages;
+import jp.mailmanager.util.MessageUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.MessageSourceAccessor;
 
 /**
  * Swingアプリケーションの例外ハンドラ
@@ -49,6 +54,8 @@ public class SwingExceptionHandler implements UncaughtExceptionHandler {
      * エラーメッセージの表示を行う。
      */
     private void showMessage() {
-        JOptionPane.showMessageDialog(null, "エラーが発生しました。詳細はエラーログを参照してください。", "エラー", JOptionPane.ERROR_MESSAGE);
+        MessageSourceAccessor message = MessageUtils.getMessageSourceAccessor();
+        JOptionPane.showMessageDialog(null, message.getMessage(Messages.ERROR_UNCAUGHT),
+                message.getMessage(Labels.INFO), JOptionPane.ERROR_MESSAGE);
     }
 }
