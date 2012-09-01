@@ -7,6 +7,7 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import jp.mailmanager.exception.SwingExceptionHandler;
 import jp.mailmanager.gui.MailManagerFrame;
 
 import org.slf4j.Logger;
@@ -44,6 +45,9 @@ public class Launcher implements Runnable {
         try {
             // ルックアンドフィールの設定を行う。
             updateLookAndFeel();
+
+            // 例外ハンドラを設定する。
+            Thread.currentThread().setUncaughtExceptionHandler(new SwingExceptionHandler());
 
             // メインウィンドウを表示する。
             MailManagerFrame frame = new MailManagerFrame();
