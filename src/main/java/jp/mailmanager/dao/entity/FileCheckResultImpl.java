@@ -37,6 +37,16 @@ public class FileCheckResultImpl extends EntityBaseImpl<FileCheckResultPK> imple
     }
 
     @Override
+    public Integer getExecutionId() {
+        return this.pk.getExecutionId();
+    }
+
+    @Override
+    public void setExecutionId(Integer executionId) {
+        this.pk.setExecutionId(executionId);
+    }
+
+    @Override
     public String getFileHash() {
         return this.pk.getFileHash();
     }

@@ -3,13 +3,23 @@
 
 <mapper namespace="jp.mailmanager.dao.mapper.FileCheckResultMapper">
 
-    <select id="selectMaxFileSeqFromFileHash" parameterType="string" resultType="int">
+    <select id="getMaxExecutionId" resultType="int">
+    <![CDATA[
+        SELECT
+            MAX(EXECUTION_ID)
+        FROM
+            FILE_CHECK_RESULT
+    ]]>
+    </select>
+
+    <select id="getMaxFileSeq" parameterType="jp.mailmanager.dao.entity.FileCheckResultPK" resultType="int">
     <![CDATA[
         SELECT
             MAX(FILE_SEQ)
         FROM
             FILE_CHECK_RESULT
         WHERE
+            EXECUTION_ID = #{executionId} AND
             FILE_HASH = #{fileHash}
     ]]>
     </select>
@@ -17,9 +27,9 @@
     <insert id="insert" parameterType="jp.mailmanager.dao.entity.FileCheckResult">
     <![CDATA[
         INSERT INTO FILE_CHECK_RESULT
-        ( FILE_HASH, FILE_SEQ, INPUT_DIR_PATH, INPUT_FILE_NAME, OUTPUT_DIR_PATH, OUTPUT_FILE_NAME, REGISTER_DATETIME, REGISTER_USER_ID, UPDATED_DATETIME, UPDATED_USER_ID, VERSION )
+        ( EXECUTION_ID, FILE_HASH, FILE_SEQ, INPUT_DIR_PATH, INPUT_FILE_NAME, OUTPUT_DIR_PATH, OUTPUT_FILE_NAME, REGISTER_DATETIME, REGISTER_USER_ID, UPDATED_DATETIME, UPDATED_USER_ID, VERSION )
         VALUES
-        ( #{fileHash}, #{fileSeq}, #{inputDirPath}, #{inputFileName}, #{outputDirPath}, #{outputFileName}, #{registerDatetime}, #{registerUserId}, #{updatedDatetime}, #{updatedUserId}, #{version} )
+        ( #{executionId}, #{fileHash}, #{fileSeq}, #{inputDirPath}, #{inputFileName}, #{outputDirPath}, #{outputFileName}, #{registerDatetime}, #{registerUserId}, #{updatedDatetime}, #{updatedUserId}, #{version} )
     ]]>
     </insert>
 

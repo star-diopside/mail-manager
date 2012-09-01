@@ -1,6 +1,7 @@
 package jp.mailmanager.dao.mapper;
 
 import jp.mailmanager.dao.entity.FileCheckResult;
+import jp.mailmanager.dao.entity.FileCheckResultPK;
 
 /**
  * ファイルチェック結果Mapperインタフェース
@@ -8,12 +9,19 @@ import jp.mailmanager.dao.entity.FileCheckResult;
 public interface FileCheckResultMapper {
 
     /**
+     * 実行IDの最大値を取得する。
+     * 
+     * @return 実行ID
+     */
+    Integer getMaxExecutionId();
+
+    /**
      * ファイルハッシュ値を条件にファイル内連番の最大値を取得する。
      * 
-     * @param fileHash ファイルハッシュ値
+     * @param param 実行ID、ファイルハッシュ値
      * @return ファイル内連番の最大値
      */
-    Integer selectMaxFileSeqFromFileHash(String fileHash);
+    Integer getMaxFileSeq(FileCheckResultPK param);
 
     /**
      * ファイルチェック結果テーブルにレコードを挿入する。

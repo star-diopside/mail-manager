@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 
 import jp.mailmanager.constant.Messages;
 import jp.mailmanager.dao.entity.FileCheckResultImpl;
+import jp.mailmanager.dao.entity.FileCheckResultPKImpl;
 import jp.mailmanager.dao.mapper.FileCheckResultMapper;
 import jp.mailmanager.exception.BusinessException;
 
@@ -32,6 +33,10 @@ public class MailFileManagerImpl implements MailFileManager {
     @Autowired
     private MessageSourceAccessor message;
 
+    /** ファイルチェック実行シーケンスMapper */
+    @Autowired
+    private FileCheckExecutionSeqMapper fileCheckExecutionSeqMapper;
+
     /** ファイルチェック結果Mapper */
     @Autowired
     private FileCheckResultMapper fileCheckResultMapper;
@@ -48,9 +53,12 @@ public class MailFileManagerImpl implements MailFileManager {
     public LinkedHashMap<File, Exception> copyMailFiles(File inputDirectory, File outputDirectory)
             throws BusinessException {
 
+        // 実行IDを取得する。
+        Integer executionId = this.fileCheckExecutionSeqMapper.getNextVal();
+
         // 再帰的にファイルコピーを行う。
         LinkedHashMap<File, Exception> errors = new LinkedHashMap<>();
-        recursiveCopyMailFiles(inputDirectory, outputDirectory, errors);
+        recursiveCopyMailFiles(executionId, inputDirectory, outputDirectory, errors);
 
         return errors;
     }
@@ -58,14 +66,15 @@ public class MailFileManagerImpl implements MailFileManager {
     /**
      * メールファイル(EML)を再帰的にコピーする。
      * 
+     * @param executionId 実行ID
      * @param inputDirectory コピー元メールファイル格納ディレクトリパス
      * @param outputDirectory コピー先ディレクトリパス
      * @param errors エラーが発生した場合のエラー情報を格納するマップオブジェクト。
      *            エラーが発生したファイルをキー、エラー情報を値に保持する。
      * @throws BusinessException 入出力ディレクトリのチェックエラーが発生した場合
      */
-    private void recursiveCopyMailFiles(File inputDirectory, File outputDirectory, LinkedHashMap<File, Exception> errors)
-            throws BusinessException {
+    private void recursiveCopyMailFiles(Integer executionId, File inputDirectory, File outputDirectory,
+            LinkedHashMap<File, Exception> errors) throws BusinessException {
 
         // コピー元ディレクトリが存在しない場合、例外をスローする。
         if (!inputDirectory.isDirectory()) {
@@ -85,12 +94,12 @@ public class MailFileManagerImpl implements MailFileManager {
 
             if (inputFile.isDirectory()) {
                 // サブディレクトリの処理を行う。
-                recursiveCopyMailFiles(inputFile, new File(outputDirectory, fileName), errors);
+                recursiveCopyMailFiles(executionId, inputFile, new File(outputDirectory, fileName), errors);
 
             } else {
                 try {
                     // ファイルコピーを行う。
-                    FileUtils.copyFile(inputFile, createOutputFileName(inputFile, outputDirectory));
+                    FileUtils.copyFile(inputFile, createOutputFileName(executionId, inputFile, outputDirectory));
                 } catch (Exception e) {
                     // マップオブジェクトにエラー情報を追加する。
                     errors.put(inputFile, e);
@@ -102,12 +111,13 @@ public class MailFileManagerImpl implements MailFileManager {
     /**
      * コピー先ファイル名を生成する。
      * 
+     * @param executionId 実行ID
      * @param inputFile コピー元ファイル
      * @param outputDirectory コピー先ディレクトリ
      * @return コピー先ファイル
      * @throws IOException ファイル入出力エラーが発生した場合
      */
-    protected File createOutputFileName(File inputFile, File outputDirectory) throws IOException {
+    protected File createOutputFileName(Integer executionId, File inputFile, File outputDirectory) throws IOException {
 
         // 入力ファイルのハッシュ値を生成する。
         String hashInputFile;
@@ -137,7 +147,10 @@ public class MailFileManagerImpl implements MailFileManager {
         }
 
         // ファイルチェック結果レコードを登録する。
-        Integer fileSeq = this.fileCheckResultMapper.selectMaxFileSeqFromFileHash(hashInputFile);
+        FileCheckResultPKImpl param = new FileCheckResultPKImpl();
+        param.setExecutionId(executionId);
+        param.setFileHash(hashInputFile);
+        Integer fileSeq = this.fileCheckResultMapper.getMaxFileSeq(param);
 
         if (fileSeq == null) {
             fileSeq = 1;
@@ -148,6 +161,7 @@ public class MailFileManagerImpl implements MailFileManager {
         FileCheckResultImpl result = new FileCheckResultImpl();
         Timestamp now = new Timestamp(System.currentTimeMillis());
 
+        result.setExecutionId(executionId);
         result.setFileHash(hashInputFile);
         result.setFileSeq(fileSeq);
         result.setInputDirPath(inputFile.getCanonicalFile().getParent());

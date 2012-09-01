@@ -6,6 +6,20 @@ package jp.mailmanager.dao.entity;
 public interface FileCheckResultPK {
 
     /**
+     * 実行IDを取得する。
+     * 
+     * @return 実行ID
+     */
+    Integer getExecutionId();
+
+    /**
+     * 実行IDを設定する。
+     * 
+     * @param executionId 実行ID
+     */
+    void setExecutionId(Integer executionId);
+
+    /**
      * ファイルハッシュ値を取得する。
      * 
      * @return ファイルハッシュ値
