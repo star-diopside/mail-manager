@@ -11,14 +11,14 @@
         http://www.springframework.org/schema/context/spring-context.xsd">
 
     <!-- コンポーネントスキャン -->
-    <context:component-scan base-package="jp.mailmanager" />
+    <context:component-scan base-package="jp.gr.java_conf.star_diopside.mailmanager" />
 
     <!-- ログ出力インターセプター -->
     <bean id="logging" class="org.springframework.aop.interceptor.SimpleTraceInterceptor" />
 
     <!-- AOP定義 -->
     <aop:config>
-        <aop:advisor pointcut="execution(public * jp.mailmanager..*(..))" advice-ref="logging" />
+        <aop:advisor pointcut="execution(* jp.gr.java_conf.star_diopside.mailmanager..*(..))" advice-ref="logging" />
     </aop:config>
 
     <!-- メッセージソース -->

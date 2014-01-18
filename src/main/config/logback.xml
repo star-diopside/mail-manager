@@ -20,7 +20,7 @@
     </appender>
 
     <!-- Logger Setting -->
-    <logger name="jp.mailmanager" level="trace">
+    <logger name="jp.gr.java_conf.star_diopside.mailmanager" level="trace">
         <appender-ref ref="TRACE" />
     </logger>
 
