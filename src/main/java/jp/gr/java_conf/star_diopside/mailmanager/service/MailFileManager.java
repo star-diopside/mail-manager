@@ -1,6 +1,6 @@
 package jp.gr.java_conf.star_diopside.mailmanager.service;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 
 import jp.gr.java_conf.star_diopside.mailmanager.exception.BusinessException;
@@ -19,7 +19,7 @@ public interface MailFileManager {
      * @throws BusinessException 
      *             inputDirectoryがディレクトリではない、またはoutputDirectoryのディレクトリが生成できない場合
      */
-    LinkedHashMap<File, Exception> copyMailFiles(String inputDirectory, String outputDirectory)
+    LinkedHashMap<Path, Exception> copyMailFiles(String inputDirectory, String outputDirectory)
             throws BusinessException;
 
     /**
@@ -31,6 +31,6 @@ public interface MailFileManager {
      * @throws BusinessException 
      *             inputDirectoryがディレクトリではない、またはoutputDirectoryのディレクトリが生成できない場合
      */
-    LinkedHashMap<File, Exception> copyMailFiles(File inputDirectory, File outputDirectory) throws BusinessException;
+    LinkedHashMap<Path, Exception> copyMailFiles(Path inputDirectory, Path outputDirectory) throws BusinessException;
 
 }

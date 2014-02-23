@@ -1,51 +1,40 @@
-package jp.gr.java_conf.star_diopside.mailmanager.controller.action;
+package jp.gr.java_conf.star_diopside.mailmanager.gui.listener;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import jp.gr.java_conf.star_diopside.mailmanager.constant.Labels;
 import jp.gr.java_conf.star_diopside.mailmanager.constant.Messages;
-import jp.gr.java_conf.star_diopside.mailmanager.controller.model.MailManagerModel;
 import jp.gr.java_conf.star_diopside.mailmanager.exception.BusinessException;
+import jp.gr.java_conf.star_diopside.mailmanager.gui.support.ComponentUtils;
 import jp.gr.java_conf.star_diopside.mailmanager.service.MailFileManager;
 import jp.gr.java_conf.star_diopside.mailmanager.util.MessageBuilder;
 
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.stereotype.Controller;
 
-/**
- * MailManager処理実行イベントクラス
- */
-@Controller
-@Scope(value = "thread", proxyMode = ScopedProxyMode.INTERFACES)
-public class MailManagerExecActionImpl implements MailManagerExecAction {
+public class MailManagerExecActionListener implements ActionListener {
 
     /** メッセージID：空ディレクトリ警告メッセージ */
     private static final String MESSAGE_NOT_EMPTY = "Message.MailManagerExec.Confirm.NotEmptyDestDir";
-
-    /** モデル */
-    private MailManagerModel model;
-
-    /** 親コンポーネント */
-    private Component parent;
 
     /** メッセージソース */
     @Autowired
@@ -55,31 +44,26 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
     @Autowired
     private MailFileManager mailFileManager;
 
-    @Override
-    public MailManagerModel getModel() {
-        return this.model;
+    private JTextField txtOrigDir;
+    private JTextField txtDestDir;
+
+    public void setTxtOrigDir(JTextField txtOrigDir) {
+        this.txtOrigDir = txtOrigDir;
     }
 
-    @Override
-    public void setModel(MailManagerModel model) {
-        this.model = model;
-    }
-
-    @Override
-    public void setParent(Component parent) {
-        this.parent = parent;
+    public void setTxtDestDir(JTextField txtDestDir) {
+        this.txtDestDir = txtDestDir;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        // メッセージビルダー
-        MessageBuilder messageBuilder = new MessageBuilder(message);
+        JFrame parent = ComponentUtils.findParent((Component) e.getSource(), JFrame.class);
 
         // コピー元ディレクトリの入力必須チェックを行う。
-        if (StringUtils.isEmpty(model.getOrigDir())) {
+        if (StringUtils.isBlank(txtOrigDir.getText())) {
             // エラーメッセージを組み立てる。
-            messageBuilder.init();
+            MessageBuilder messageBuilder = new MessageBuilder(message);
             messageBuilder.setMessageCode(Messages.ERROR_REQUIRED);
             messageBuilder.addArgumentCode(Labels.COPY_ORIG_DIR);
 
@@ -90,9 +74,9 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         }
 
         // コピー先ディレクトリの入力必須チェックを行う。
-        if (StringUtils.isEmpty(this.model.getDestDir())) {
+        if (StringUtils.isBlank(txtDestDir.getText())) {
             // エラーメッセージを組み立てる。
-            messageBuilder.init();
+            MessageBuilder messageBuilder = new MessageBuilder(message);
             messageBuilder.setMessageCode(Messages.ERROR_REQUIRED);
             messageBuilder.addArgumentCode(Labels.COPY_DEST_DIR);
 
@@ -103,11 +87,11 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         }
 
         // コピー元ディレクトリの存在チェックを行う。
-        File origDir = new File(model.getOrigDir());
+        Path origDir = Paths.get(txtOrigDir.getText());
 
-        if (!origDir.isDirectory()) {
+        if (!Files.isDirectory(origDir)) {
             // エラーメッセージを組み立てる。
-            messageBuilder.init();
+            MessageBuilder messageBuilder = new MessageBuilder(message);
             messageBuilder.setMessageCode(Messages.ERROR_NOT_EXISTS);
             messageBuilder.addArgumentCode(Labels.COPY_ORIG_DIR);
 
@@ -118,14 +102,21 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         }
 
         // コピー先ディレクトリが空ディレクトリであるか確認する。
-        File destDir = new File(model.getDestDir());
+        Path destDir = Paths.get(txtDestDir.getText());
 
-        if (!ArrayUtils.isEmpty(destDir.list())) {
-            // 確認ダイアログを表示し、キャンセルされた場合は処理を終了する。
-            if (JOptionPane.showConfirmDialog(parent, message.getMessage(MESSAGE_NOT_EMPTY),
-                    message.getMessage(Labels.CONFIRM), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.OK_OPTION) {
-                return;
+        try {
+            if (!isEmptyDirectory(destDir)) {
+                // 確認ダイアログを表示し、キャンセルされた場合は処理を終了する。
+                if (JOptionPane.showConfirmDialog(parent, message.getMessage(MESSAGE_NOT_EMPTY),
+                        message.getMessage(Labels.CONFIRM), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) != JOptionPane.OK_OPTION) {
+                    return;
+                }
             }
+        } catch (IOException ex) {
+            // エラーダイアログを表示する。
+            JOptionPane.showMessageDialog(parent, ex.getMessage(), message.getMessage(Labels.ERROR),
+                    JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         // 処理実行前に確認を行う。
@@ -138,7 +129,7 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         LinkedHashMap<Path, Exception> errors;
 
         try {
-            errors = mailFileManager.copyMailFiles(origDir.toPath(), destDir.toPath());
+            errors = mailFileManager.copyMailFiles(origDir, destDir);
         } catch (BusinessException ex) {
             // エラーダイアログを表示する。
             JOptionPane.showMessageDialog(parent, ex.getMessage(), message.getMessage(Labels.ERROR),
@@ -147,10 +138,9 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         }
 
         // 処理結果を出力する。
-        File result = new File(destDir, "errors.csv");
+        Path result = destDir.resolve("errors.csv");
 
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(result), "UTF-8"))) {
-
+        try (BufferedWriter bw = Files.newBufferedWriter(result, Charsets.UTF_8)) {
             for (Map.Entry<Path, Exception> error : errors.entrySet()) {
                 bw.write(StringEscapeUtils.escapeCsv(error.getKey().toString()));
                 bw.write(',');
@@ -171,5 +161,18 @@ public class MailManagerExecActionImpl implements MailManagerExecAction {
         // 完了メッセージを出力する。
         JOptionPane.showMessageDialog(parent, message.getMessage(Messages.INFO_COMPLETE),
                 message.getMessage(Labels.INFO), JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private static boolean isEmptyDirectory(Path path) throws IOException {
+
+        if (Files.notExists(path)) {
+            return true;
+        } else if (!Files.isDirectory(path)) {
+            return false;
+        } else {
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(path)) {
+                return !ds.iterator().hasNext();
+            }
+        }
     }
 }

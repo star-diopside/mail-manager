@@ -2,16 +2,17 @@ package jp.gr.java_conf.star_diopside.mailmanager.main;
 
 import java.util.ResourceBundle;
 
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import jp.gr.java_conf.star_diopside.mailmanager.exception.SwingExceptionHandler;
-import jp.gr.java_conf.star_diopside.mailmanager.gui.MailManagerFrame;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * アプリケーション実行クラス
@@ -50,8 +51,10 @@ public class Launcher implements Runnable {
             Thread.currentThread().setUncaughtExceptionHandler(new SwingExceptionHandler());
 
             // メインウィンドウを表示する。
-            MailManagerFrame frame = new MailManagerFrame();
-            frame.init();
+            try (ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml")) {
+                JFrame frame = context.getBean("mailManagerFrame", JFrame.class);
+                frame.setVisible(true);
+            }
 
         } catch (Throwable t) {
             // エラーログを出力する。

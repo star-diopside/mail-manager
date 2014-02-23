@@ -10,6 +10,8 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <import resource="classpath:/META-INF/spring/swing/mail-manager-frame-context.xml" />
+
     <!-- コンポーネントスキャン -->
     <context:component-scan base-package="jp.gr.java_conf.star_diopside.mailmanager" />
 
@@ -18,7 +20,7 @@
 
     <!-- AOP定義 -->
     <aop:config>
-        <aop:advisor pointcut="execution(* jp.gr.java_conf.star_diopside.mailmanager..*(..))" advice-ref="logging" />
+        <aop:advisor pointcut="execution(* jp.gr.java_conf.star_diopside.mailmanager..*(..)) and !execution(* jp.gr.java_conf.star_diopside.mailmanager.gui.support..*(..))" advice-ref="logging" />
     </aop:config>
 
     <!-- メッセージソース -->

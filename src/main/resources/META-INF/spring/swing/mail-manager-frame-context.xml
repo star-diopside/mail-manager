@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="mailManagerFrame" class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JFrameAssociateBean">
+        <property name="frame">
+            <bean class="javax.swing.JFrame">
+                <property name="title" value="MailManager" />
+                <property name="defaultCloseOperation">
+                    <util:constant static-field="javax.swing.JFrame.EXIT_ON_CLOSE" />
+                </property>
+                <property name="jMenuBar">
+                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JComponentAssociateBean">
+                        <property name="component">
+                            <bean class="javax.swing.JMenuBar" />
+                        </property>
+                        <property name="containerComponents">
+                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.SimpleComponent">
+                                <property name="component">
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JComponentAssociateBean">
+                                        <property name="component">
+                                            <bean class="javax.swing.JMenu">
+                                                <constructor-arg index="0" value="ファイル(F)" />
+                                                <property name="mnemonic">
+                                                    <util:constant static-field="java.awt.event.KeyEvent.VK_F" />
+                                                </property>
+                                            </bean>
+                                        </property>
+                                        <property name="containerComponents">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.SimpleComponent">
+                                                <property name="component">
+                                                    <bean class="javax.swing.JMenuItem">
+                                                        <constructor-arg index="0" value="アプリケーションの終了(X)" />
+                                                        <property name="mnemonic">
+                                                            <util:constant static-field="java.awt.event.KeyEvent.VK_X" />
+                                                        </property>
+                                                    </bean>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </property>
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+                <property name="locationByPlatform" value="true" />
+                <property name="rootPane.defaultButton" ref="mailManagerFrame.btnExec" />
+            </bean>
+        </property>
+        <property name="containerComponents">
+            <list>
+                <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                    <property name="component">
+                        <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JComponentAssociateBean">
+                            <property name="component">
+                                <bean class="javax.swing.JPanel">
+                                    <property name="border">
+                                        <bean class="javax.swing.border.EmptyBorder">
+                                            <constructor-arg index="0" value="16" />
+                                            <constructor-arg index="1" value="16" />
+                                            <constructor-arg index="2" value="16" />
+                                            <constructor-arg index="3" value="16" />
+                                        </bean>
+                                    </property>
+                                    <property name="layout">
+                                        <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagLayoutSupport">
+                                            <property name="columnWidths">
+                                                <array value-type="int">
+                                                    <value>0</value>
+                                                    <value>0</value>
+                                                    <value>0</value>
+                                                    <value>0</value>
+                                                </array>
+                                            </property>
+                                            <property name="rowHeights">
+                                                <array value-type="int">
+                                                    <value>0</value>
+                                                    <value>0</value>
+                                                    <value>0</value>
+                                                </array>
+                                            </property>
+                                            <property name="columnWeights">
+                                                <array value-type="double">
+                                                    <value>0.0</value>
+                                                    <value>1.0</value>
+                                                    <value>0.0</value>
+                                                    <util:constant static-field="java.lang.Double.MIN_VALUE" />
+                                                </array>
+                                            </property>
+                                            <property name="rowWeights">
+                                                <array value-type="double">
+                                                    <value>1.0</value>
+                                                    <value>1.0</value>
+                                                    <util:constant static-field="java.lang.Double.MIN_VALUE" />
+                                                </array>
+                                            </property>
+                                        </bean>
+                                    </property>
+                                </bean>
+                            </property>
+                            <property name="containerComponents">
+                                <list>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component">
+                                            <bean class="javax.swing.JLabel">
+                                                <constructor-arg index="0" value="コピー元ディレクトリ: " />
+                                            </bean>
+                                        </property>
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="insets">
+                                                    <bean class="java.awt.Insets">
+                                                        <constructor-arg index="0" value="0" />
+                                                        <constructor-arg index="1" value="0" />
+                                                        <constructor-arg index="2" value="5" />
+                                                        <constructor-arg index="3" value="5" />
+                                                    </bean>
+                                                </property>
+                                                <property name="anchor">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.EAST" />
+                                                </property>
+                                                <property name="gridx" value="0" />
+                                                <property name="gridy" value="0" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component" ref="mailManagerFrame.txtOrigDir" />
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="insets">
+                                                    <bean class="java.awt.Insets">
+                                                        <constructor-arg index="0" value="0" />
+                                                        <constructor-arg index="1" value="0" />
+                                                        <constructor-arg index="2" value="5" />
+                                                        <constructor-arg index="3" value="5" />
+                                                    </bean>
+                                                </property>
+                                                <property name="fill">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.HORIZONTAL" />
+                                                </property>
+                                                <property name="gridx" value="1" />
+                                                <property name="gridy" value="0" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component" ref="mailManagerFrame.btnOrigDir" />
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="insets">
+                                                    <bean class="java.awt.Insets">
+                                                        <constructor-arg index="0" value="0" />
+                                                        <constructor-arg index="1" value="0" />
+                                                        <constructor-arg index="2" value="5" />
+                                                        <constructor-arg index="3" value="0" />
+                                                    </bean>
+                                                </property>
+                                                <property name="gridx" value="2" />
+                                                <property name="gridy" value="0" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component">
+                                            <bean class="javax.swing.JLabel">
+                                                <constructor-arg index="0" value="コピー先ディレクトリ: " />
+                                            </bean>
+                                        </property>
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="insets">
+                                                    <bean class="java.awt.Insets">
+                                                        <constructor-arg index="0" value="0" />
+                                                        <constructor-arg index="1" value="0" />
+                                                        <constructor-arg index="2" value="0" />
+                                                        <constructor-arg index="3" value="5" />
+                                                    </bean>
+                                                </property>
+                                                <property name="anchor">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.EAST" />
+                                                </property>
+                                                <property name="gridx" value="0" />
+                                                <property name="gridy" value="1" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component" ref="mailManagerFrame.txtDestDir" />
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="insets">
+                                                    <bean class="java.awt.Insets">
+                                                        <constructor-arg index="0" value="0" />
+                                                        <constructor-arg index="1" value="0" />
+                                                        <constructor-arg index="2" value="0" />
+                                                        <constructor-arg index="3" value="5" />
+                                                    </bean>
+                                                </property>
+                                                <property name="fill">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.HORIZONTAL" />
+                                                </property>
+                                                <property name="gridx" value="1" />
+                                                <property name="gridy" value="1" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component" ref="mailManagerFrame.btnDestDir" />
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="gridx" value="2" />
+                                                <property name="gridy" value="1" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="constraints">
+                        <util:constant static-field="java.awt.BorderLayout.CENTER" />
+                    </property>
+                </bean>
+                <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                    <property name="component">
+                        <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JComponentAssociateBean">
+                            <property name="component">
+                                <bean class="javax.swing.JPanel">
+                                    <property name="border">
+                                        <bean class="javax.swing.border.MatteBorder">
+                                            <constructor-arg index="0" value="1" />
+                                            <constructor-arg index="1" value="0" />
+                                            <constructor-arg index="2" value="0" />
+                                            <constructor-arg index="3" value="0" />
+                                            <constructor-arg index="4">
+                                                <util:constant static-field="java.awt.SystemColor.activeCaptionBorder" />
+                                            </constructor-arg>
+                                        </bean>
+                                    </property>
+                                    <property name="layout">
+                                        <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagLayoutSupport">
+                                            <property name="columnWidths">
+                                                <array value-type="int">
+                                                    <value>305</value>
+                                                    <value>129</value>
+                                                    <value>0</value>
+                                                </array>
+                                            </property>
+                                            <property name="rowHeights">
+                                                <array value-type="int">
+                                                    <value>43</value>
+                                                    <value>0</value>
+                                                </array>
+                                            </property>
+                                            <property name="columnWeights">
+                                                <array value-type="double">
+                                                    <value>1.0</value>
+                                                    <value>1.0</value>
+                                                    <util:constant static-field="java.lang.Double.MIN_VALUE" />
+                                                </array>
+                                            </property>
+                                            <property name="rowWeights">
+                                                <array value-type="double">
+                                                    <value>1.0</value>
+                                                    <util:constant static-field="java.lang.Double.MIN_VALUE" />
+                                                </array>
+                                            </property>
+                                        </bean>
+                                    </property>
+                                </bean>
+                            </property>
+                            <property name="containerComponents">
+                                <list>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JComponentAssociateBean">
+                                                <property name="component">
+                                                    <bean class="javax.swing.JPanel">
+                                                        <property name="layout.alignment">
+                                                            <util:constant static-field="java.awt.FlowLayout.LEFT" />
+                                                        </property>
+                                                        <property name="border">
+                                                            <bean class="javax.swing.border.EmptyBorder">
+                                                                <constructor-arg index="0" value="6" />
+                                                                <constructor-arg index="1" value="11" />
+                                                                <constructor-arg index="2" value="6" />
+                                                                <constructor-arg index="3" value="11" />
+                                                            </bean>
+                                                        </property>
+                                                    </bean>
+                                                </property>
+                                                <property name="containerComponents">
+                                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.SimpleComponent">
+                                                        <property name="component">
+                                                            <bean class="javax.swing.JButton">
+                                                                <constructor-arg index="0" value="閉じる" />
+                                                            </bean>
+                                                        </property>
+                                                    </bean>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="anchor">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.WEST" />
+                                                </property>
+                                                <property name="insets">
+                                                    <bean class="java.awt.Insets">
+                                                        <constructor-arg index="0" value="0" />
+                                                        <constructor-arg index="1" value="0" />
+                                                        <constructor-arg index="2" value="0" />
+                                                        <constructor-arg index="3" value="5" />
+                                                    </bean>
+                                                </property>
+                                                <property name="fill">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.VERTICAL" />
+                                                </property>
+                                                <property name="gridx" value="0" />
+                                                <property name="gridy" value="0" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ConstraintsComponent">
+                                        <property name="component">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.JComponentAssociateBean">
+                                                <property name="component">
+                                                    <bean class="javax.swing.JPanel">
+                                                        <property name="layout.alignment">
+                                                            <util:constant static-field="java.awt.FlowLayout.RIGHT" />
+                                                        </property>
+                                                        <property name="border">
+                                                            <bean class="javax.swing.border.EmptyBorder">
+                                                                <constructor-arg index="0" value="6" />
+                                                                <constructor-arg index="1" value="11" />
+                                                                <constructor-arg index="2" value="6" />
+                                                                <constructor-arg index="3" value="11" />
+                                                            </bean>
+                                                        </property>
+                                                    </bean>
+                                                </property>
+                                                <property name="containerComponents">
+                                                    <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.SimpleComponent">
+                                                        <property name="component" ref="mailManagerFrame.btnExec" />
+                                                    </bean>
+                                                </property>
+                                            </bean>
+                                        </property>
+                                        <property name="constraints">
+                                            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.GridBagConstraintsSupport">
+                                                <property name="anchor">
+                                                    <util:constant static-field="java.awt.GridBagConstraints.NORTHEAST" />
+                                                </property>
+                                                <property name="gridx" value="1" />
+                                                <property name="gridy" value="0" />
+                                            </bean>
+                                        </property>
+                                    </bean>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                    <property name="constraints">
+                        <util:constant static-field="java.awt.BorderLayout.SOUTH" />
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="mailManagerFrame.txtOrigDir" class="javax.swing.JTextField" />
+
+    <bean id="mailManagerFrame.txtDestDir" class="javax.swing.JTextField" />
+
+    <bean id="mailManagerFrame.btnOrigDir" class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ActionListenerAssociateBean">
+        <property name="button">
+            <bean class="javax.swing.JButton">
+                <constructor-arg index="0" value="選択" />
+            </bean>
+        </property>
+        <property name="actionListeners">
+            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.listener.DirectorySelectActionListener">
+                <property name="textComponent" ref="mailManagerFrame.txtOrigDir" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="mailManagerFrame.btnDestDir" class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ActionListenerAssociateBean">
+        <property name="button">
+            <bean class="javax.swing.JButton">
+                <constructor-arg index="0" value="選択" />
+            </bean>
+        </property>
+        <property name="actionListeners">
+            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.listener.DirectorySelectActionListener">
+                <property name="textComponent" ref="mailManagerFrame.txtDestDir" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="mailManagerFrame.btnExec" class="jp.gr.java_conf.star_diopside.mailmanager.gui.support.ActionListenerAssociateBean">
+        <property name="button">
+            <bean class="javax.swing.JButton">
+                <constructor-arg index="0" value="処理実行(R)" />
+                <property name="mnemonic">
+                    <util:constant static-field="java.awt.event.KeyEvent.VK_R" />
+                </property>
+            </bean>
+        </property>
+        <property name="actionListeners">
+            <bean class="jp.gr.java_conf.star_diopside.mailmanager.gui.listener.MailManagerExecActionListener">
+                <property name="txtOrigDir" ref="mailManagerFrame.txtOrigDir" />
+                <property name="txtDestDir" ref="mailManagerFrame.txtDestDir" />
+            </bean>
+        </property>
+    </bean>
+
+</beans>

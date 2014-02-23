@@ -1,9 +1,11 @@
 package jp.gr.java_conf.star_diopside.mailmanager.service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -15,7 +17,6 @@ import jp.gr.java_conf.star_diopside.mailmanager.dao.mapper.FileCheckResultMappe
 import jp.gr.java_conf.star_diopside.mailmanager.exception.BusinessException;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,21 +44,21 @@ public class MailFileManagerImpl implements MailFileManager {
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public LinkedHashMap<File, Exception> copyMailFiles(String inputDirectory, String outputDirectory)
+    public LinkedHashMap<Path, Exception> copyMailFiles(String inputDirectory, String outputDirectory)
             throws BusinessException {
-        return copyMailFiles(new File(inputDirectory), new File(outputDirectory));
+        return copyMailFiles(Paths.get(inputDirectory), Paths.get(outputDirectory));
     }
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public LinkedHashMap<File, Exception> copyMailFiles(File inputDirectory, File outputDirectory)
+    public LinkedHashMap<Path, Exception> copyMailFiles(Path inputDirectory, Path outputDirectory)
             throws BusinessException {
 
         // 実行IDを取得する。
         Integer executionId = this.fileCheckExecutionSeqMapper.getNextVal();
 
         // 再帰的にファイルコピーを行う。
-        LinkedHashMap<File, Exception> errors = new LinkedHashMap<>();
+        LinkedHashMap<Path, Exception> errors = new LinkedHashMap<>();
         recursiveCopyMailFiles(executionId, inputDirectory, outputDirectory, errors);
 
         return errors;
@@ -73,38 +74,45 @@ public class MailFileManagerImpl implements MailFileManager {
      *            エラーが発生したファイルをキー、エラー情報を値に保持する。
      * @throws BusinessException 入出力ディレクトリのチェックエラーが発生した場合
      */
-    private void recursiveCopyMailFiles(Integer executionId, File inputDirectory, File outputDirectory,
-            LinkedHashMap<File, Exception> errors) throws BusinessException {
+    private void recursiveCopyMailFiles(Integer executionId, Path inputDirectory, Path outputDirectory,
+            LinkedHashMap<Path, Exception> errors) throws BusinessException {
 
         // コピー元ディレクトリが存在しない場合、例外をスローする。
-        if (!inputDirectory.isDirectory()) {
+        if (!Files.isDirectory(inputDirectory)) {
             throw new BusinessException(message.getMessage(Messages.ERROR_NOT_EXISTS_DIR,
                     new Object[] { inputDirectory }));
         }
 
         // コピー先ディレクトリが作成できない場合、例外をスローする。
-        if (!outputDirectory.exists() && !outputDirectory.mkdirs()) {
+        try {
+            Files.createDirectories(outputDirectory);
+        } catch (IOException e) {
             throw new BusinessException(message.getMessage(Messages.ERROR_NOT_MAKE_DIR,
-                    new Object[] { outputDirectory }));
+                    new Object[] { outputDirectory }), e);
         }
 
-        for (String fileName : inputDirectory.list()) {
+        try (DirectoryStream<Path> inputDirectoryStream = Files.newDirectoryStream(inputDirectory)) {
+            for (Path inputFile : inputDirectoryStream) {
+                Path fileName = inputDirectory.relativize(inputFile);
 
-            File inputFile = new File(inputDirectory, fileName);
+                if (Files.isDirectory(inputFile)) {
+                    // サブディレクトリの処理を行う。
+                    recursiveCopyMailFiles(executionId, inputFile, outputDirectory.resolve(fileName), errors);
 
-            if (inputFile.isDirectory()) {
-                // サブディレクトリの処理を行う。
-                recursiveCopyMailFiles(executionId, inputFile, new File(outputDirectory, fileName), errors);
-
-            } else {
-                try {
-                    // ファイルコピーを行う。
-                    FileUtils.copyFile(inputFile, createOutputFileName(executionId, inputFile, outputDirectory));
-                } catch (Exception e) {
-                    // マップオブジェクトにエラー情報を追加する。
-                    errors.put(inputFile, e);
+                } else {
+                    try {
+                        // ファイルコピーを行う。
+                        Files.copy(inputFile, createOutputFileName(executionId, inputFile, outputDirectory));
+                    } catch (Exception e) {
+                        // マップオブジェクトにエラー情報を追加する。
+                        errors.put(inputFile, e);
+                    }
                 }
             }
+
+        } catch (IOException e) {
+            throw new BusinessException(message.getMessage(Messages.ERROR_NOT_MAKE_DIR,
+                    new Object[] { outputDirectory }), e);
         }
     }
 
@@ -117,16 +125,16 @@ public class MailFileManagerImpl implements MailFileManager {
      * @return コピー先ファイル
      * @throws IOException ファイル入出力エラーが発生した場合
      */
-    protected File createOutputFileName(Integer executionId, File inputFile, File outputDirectory) throws IOException {
+    protected Path createOutputFileName(Integer executionId, Path inputFile, Path outputDirectory) throws IOException {
 
         // 入力ファイルのハッシュ値を生成する。
         String hashInputFile;
-        try (InputStream is = new FileInputStream(inputFile)) {
-            hashInputFile = DigestUtils.shaHex(is);
+        try (InputStream is = Files.newInputStream(inputFile)) {
+            hashInputFile = DigestUtils.sha1Hex(is);
         }
 
         // 拡張子
-        String ext = FilenameUtils.getExtension(inputFile.getPath());
+        String ext = FilenameUtils.getExtension(inputFile.toString());
         if (!StringUtils.isEmpty(ext)) {
             ext = '.' + ext;
         }
@@ -135,15 +143,15 @@ public class MailFileManagerImpl implements MailFileManager {
         String base = hashInputFile;
 
         // コピー先ファイルパス
-        File outputFile = new File(outputDirectory, base + ext);
+        Path outputFile = outputDirectory.resolve(base + ext);
 
         int count = 1;
 
         // 同名のファイル名が存在する場合
-        while (outputFile.exists() && !equalsFile(inputFile, hashInputFile, outputFile)) {
+        while (Files.exists(outputFile) && !equalsFile(inputFile, hashInputFile, outputFile)) {
             // ファイル名に連番を付与する。
             count++;
-            outputFile = new File(outputDirectory, base + " (" + count + ")" + ext);
+            outputFile = outputDirectory.resolve(base + " (" + count + ")" + ext);
         }
 
         // ファイルチェック結果レコードを登録する。
@@ -164,10 +172,10 @@ public class MailFileManagerImpl implements MailFileManager {
         result.setExecutionId(executionId);
         result.setFileHash(hashInputFile);
         result.setFileSeq(fileSeq);
-        result.setInputDirPath(inputFile.getCanonicalFile().getParent());
-        result.setInputFileName(inputFile.getName());
-        result.setOutputDirPath(outputFile.getCanonicalFile().getParent());
-        result.setOutputFileName(outputFile.getName());
+        result.setInputDirPath(inputFile.toAbsolutePath().normalize().getParent().toString());
+        result.setInputFileName(inputFile.getFileName().toString());
+        result.setOutputDirPath(outputFile.toAbsolutePath().normalize().getParent().toString());
+        result.setOutputFileName(outputFile.getFileName().toString());
         result.setRegisterDatetime(now);
         result.setRegisterUserId(StringUtils.EMPTY);
         result.setUpdatedDatetime(now);
@@ -188,23 +196,23 @@ public class MailFileManagerImpl implements MailFileManager {
      * @return ファイルデータが一致する場合はtrue、一致しない場合はfalseを返す。
      * @throws IOException ファイル入出力エラーが発生した場合
      */
-    private boolean equalsFile(File inputFile, String hashInputFile, File outputFile) throws IOException {
+    private boolean equalsFile(Path inputFile, String hashInputFile, Path outputFile) throws IOException {
 
         // ファイルサイズの一致チェックを行う。
-        if (inputFile.length() != outputFile.length()) {
+        if (Files.size(inputFile) != Files.size(outputFile)) {
             return false;
         }
 
         // ファイルのハッシュ値を比較する。
-        try (InputStream is = new FileInputStream(outputFile)) {
-            if (hashInputFile.compareToIgnoreCase(DigestUtils.shaHex(is)) != 0) {
+        try (InputStream is = Files.newInputStream(outputFile)) {
+            if (hashInputFile.compareToIgnoreCase(DigestUtils.sha1Hex(is)) != 0) {
                 return false;
             }
         }
 
         // ファイルのバイトデータ一致チェックを行う。
-        byte[] inputFileBytes = FileUtils.readFileToByteArray(inputFile);
-        byte[] outputFileBytes = FileUtils.readFileToByteArray(outputFile);
+        byte[] inputFileBytes = Files.readAllBytes(inputFile);
+        byte[] outputFileBytes = Files.readAllBytes(outputFile);
 
         return Arrays.equals(inputFileBytes, outputFileBytes);
     }
