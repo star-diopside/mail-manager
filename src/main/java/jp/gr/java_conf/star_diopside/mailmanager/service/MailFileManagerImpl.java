@@ -2,10 +2,12 @@ package jp.gr.java_conf.star_diopside.mailmanager.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -51,31 +53,11 @@ public class MailFileManagerImpl implements MailFileManager {
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public LinkedHashMap<Path, Exception> copyMailFiles(Path inputDirectory, Path outputDirectory)
+    public LinkedHashMap<Path, Exception> copyMailFiles(final Path inputDirectory, final Path outputDirectory)
             throws BusinessException {
 
         // 実行IDを取得する。
-        Integer executionId = this.fileCheckExecutionSeqMapper.getNextVal();
-
-        // 再帰的にファイルコピーを行う。
-        LinkedHashMap<Path, Exception> errors = new LinkedHashMap<>();
-        recursiveCopyMailFiles(executionId, inputDirectory, outputDirectory, errors);
-
-        return errors;
-    }
-
-    /**
-     * メールファイル(EML)を再帰的にコピーする。
-     * 
-     * @param executionId 実行ID
-     * @param inputDirectory コピー元メールファイル格納ディレクトリパス
-     * @param outputDirectory コピー先ディレクトリパス
-     * @param errors エラーが発生した場合のエラー情報を格納するマップオブジェクト。
-     *            エラーが発生したファイルをキー、エラー情報を値に保持する。
-     * @throws BusinessException 入出力ディレクトリのチェックエラーが発生した場合
-     */
-    private void recursiveCopyMailFiles(Integer executionId, Path inputDirectory, Path outputDirectory,
-            LinkedHashMap<Path, Exception> errors) throws BusinessException {
+        final Integer executionId = this.fileCheckExecutionSeqMapper.getNextVal();
 
         // コピー元ディレクトリが存在しない場合、例外をスローする。
         if (!Files.isDirectory(inputDirectory)) {
@@ -91,29 +73,46 @@ public class MailFileManagerImpl implements MailFileManager {
                     new Object[] { outputDirectory }), e);
         }
 
-        try (DirectoryStream<Path> inputDirectoryStream = Files.newDirectoryStream(inputDirectory)) {
-            for (Path inputFile : inputDirectoryStream) {
-                Path fileName = inputDirectory.relativize(inputFile);
+        // 再帰的にファイルコピーを行う。
+        final LinkedHashMap<Path, Exception> errors = new LinkedHashMap<>();
 
-                if (Files.isDirectory(inputFile)) {
-                    // サブディレクトリの処理を行う。
-                    recursiveCopyMailFiles(executionId, inputFile, outputDirectory.resolve(fileName), errors);
+        try {
+            Files.walkFileTree(inputDirectory, new SimpleFileVisitor<Path>() {
 
-                } else {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    Path relativePath = inputDirectory.relativize(dir);
+                    Path outDir = outputDirectory.resolve(relativePath);
+                    if (Files.notExists(outDir)) {
+                        Files.createDirectory(outDir);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Path relativePath = inputDirectory.relativize(file.getParent());
                     try {
                         // ファイルコピーを行う。
-                        Files.copy(inputFile, createOutputFileName(executionId, inputFile, outputDirectory));
-                    } catch (Exception e) {
-                        // マップオブジェクトにエラー情報を追加する。
-                        errors.put(inputFile, e);
+                        Files.copy(file, createOutputFileName(executionId, file, outputDirectory.resolve(relativePath)));
+                    } catch (IOException e) {
+                        errors.put(file, e);
                     }
+                    return FileVisitResult.CONTINUE;
                 }
-            }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    errors.put(file, exc);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
 
         } catch (IOException e) {
-            throw new BusinessException(message.getMessage(Messages.ERROR_NOT_MAKE_DIR,
-                    new Object[] { outputDirectory }), e);
+            throw new BusinessException(message.getMessage(Messages.ERROR_UNCAUGHT), e);
         }
+
+        return errors;
     }
 
     /**
